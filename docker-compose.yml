@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-kpi}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kpi}
+      POSTGRES_DB: ${POSTGRES_DB:-kpidb}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-kpi} -d ${POSTGRES_DB:-kpidb}"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://kpi:kpi@postgres:5432/kpidb}
+    volumes:
+      - ./backend/app:/app/app
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    environment:
+      VITE_API_TARGET: ${VITE_API_TARGET:-http://backend:8000}
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/index.html:/app/index.html
+      - ./frontend/vite.config.ts:/app/vite.config.ts
+
+volumes:
+  postgres_data:
