@@ -1,3 +1,5 @@
+import os
+
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -8,9 +10,19 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Twygo KPI API")
 
+# Em desenvolvimento o Vite faz proxy de /api pro backend (vite.config.ts), e
+# em produção (Dokploy) é o nginx que faz isso — ver frontend/nginx.conf. Nos
+# dois casos o navegador fala com uma origem só, então CORS não entra em jogo
+# de verdade. Isto aqui é só para quem acessa a API direto (Swagger em /docs,
+# um teste manual com curl de outra origem) — CORS_ORIGINS separado por
+# vírgula, com o padrão de desenvolvimento se a variável não existir.
+origens = [o.strip() for o in
+           os.environ.get("CORS_ORIGINS", "http://localhost:5173").split(",")
+           if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=origens,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
