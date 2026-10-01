@@ -1,16 +1,28 @@
-from fastapi import APIRouter, FastAPI
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.db import Base, engine
-from app.routers import kpis
+from app.db import Base, SessionLocal, engine
+from app.routers import dashboard, kpis
+from app.seed import seed_if_empty
 
-Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Twygo KPI API")
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    # Cria as tabelas que ainda não existem (não altera tabelas já criadas:
+    # se mudar um model, rode `make reset` para recriar o banco local).
+    Base.metadata.create_all(bind=engine)
+    with SessionLocal() as db:
+        seed_if_empty(db)
+    yield
+
+
+app = FastAPI(title="Twygo KPI API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -22,19 +34,6 @@ def health():
     return {"status": "ok"}
 
 
-# Example router with mocked data, useful to wire up the dashboard
-# before the real /api/kpis (routers/kpis.py) has any data in the DB.
-mock_router = APIRouter(prefix="/api/kpis", tags=["kpis-mock"])
-
-
-@mock_router.get("/mock")
-def mock_kpis():
-    return [
-        {"id": 1, "nome": "Usuarios ativos", "valor": 1200, "variacao": 5.4},
-        {"id": 2, "nome": "Receita mensal", "valor": 89500.0, "variacao": -2.1},
-        {"id": 3, "nome": "Churn", "valor": 3.2, "variacao": 0.5},
-    ]
-
-
-app.include_router(mock_router)
+# Registre aqui cada novo router criado em app/routers/.
+app.include_router(dashboard.router)
 app.include_router(kpis.router)

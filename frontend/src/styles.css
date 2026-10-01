@@ -534,3 +534,30 @@ button:focus-visible {
 .error {
   color: #c0392b;
 }
+
+/* ---------- estados (carregando / erro / vazio) ---------- */
+
+.state-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+}
+
+.state-card--error {
+  border-color: rgba(208, 59, 59, 0.35);
+  color: #c0392b;
+}
+
+.state-card__detail {
+  margin-top: 4px;
+  color: var(--ink-muted);
+  font-size: 0.82rem;
+}

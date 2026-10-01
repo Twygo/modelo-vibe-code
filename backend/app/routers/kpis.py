@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app import models, schemas
@@ -9,14 +10,14 @@ router = APIRouter(prefix="/api/kpis", tags=["kpis"])
 
 @router.get("", response_model=list[schemas.KpiOut])
 def list_kpis(db: Session = Depends(get_db)):
-    return db.query(models.Kpi).all()
+    return db.scalars(select(models.Kpi).order_by(models.Kpi.id)).all()
 
 
 @router.get("/{kpi_id}", response_model=schemas.KpiOut)
 def get_kpi(kpi_id: int, db: Session = Depends(get_db)):
     kpi = db.get(models.Kpi, kpi_id)
     if kpi is None:
-        raise HTTPException(status_code=404, detail="Kpi not found")
+        raise HTTPException(status_code=404, detail="KPI não encontrado")
     return kpi
 
 

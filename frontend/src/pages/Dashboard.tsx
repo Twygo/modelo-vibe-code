@@ -6,67 +6,148 @@ import {
   Cell,
   Line,
   LineChart,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
+import { useApi } from "../lib/api";
 import { downloadCsv } from "../lib/csv";
+import {
+  formatDate,
+  formatKpiValue,
+  formatMonth,
+  formatNumber,
+  formatVariation,
+  type KpiUnit,
+} from "../lib/format";
 
-// Dados mockados — trocar por fetch em /api/kpis (ou /api/kpis/mock) quando
-// o backend tiver dados reais. "name" é a chave de cross-filter: clicar num
-// card ou numa barra seleciona esse indicador e filtra a tabela abaixo.
-const kpis = [
-  { name: "Usuarios ativos", value: "1.200", chartValue: 1200, delta: "+5.4%", accent: "var(--series-1)", updatedAt: "2026-08-21" },
-  { name: "Receita mensal", value: "R$ 89.500,00", chartValue: 895, delta: "-2.1%", accent: "var(--series-2)", updatedAt: "2026-08-21" },
-  { name: "Churn", value: "3,2%", chartValue: 32, delta: "+0.5%", accent: "var(--series-3)", updatedAt: "2026-08-20" },
-  { name: "NPS", value: "89", chartValue: 89, delta: "+18.7%", accent: "var(--series-4)", updatedAt: "2026-08-19" },
-];
+// Formato que o backend devolve em GET /api/dashboard
+// (ver backend/app/routers/dashboard.py e backend/app/schemas.py).
+type DashboardKpi = {
+  id: number;
+  name: string;
+  value: number;
+  unit: KpiUnit;
+  variation: number;
+  featured: boolean;
+  updated_at: string;
+  history: { period: string; value: number }[];
+};
 
-const extraRows = [
-  { name: "Ticket medio", value: "R$ 149,90", delta: "+1.2%", updatedAt: "2026-08-18" },
-  { name: "Tempo de resposta (h)", value: "3,4", delta: "-9.8%", updatedAt: "2026-08-18" },
-];
+type DashboardData = { kpis: DashboardKpi[] };
 
-const tableRows = [...kpis, ...extraRows];
+// Cores dos cards, na ordem em que aparecem (tokens definidos em styles.css).
+const ACCENTS = ["var(--series-1)", "var(--series-2)", "var(--series-3)", "var(--series-4)"];
 
-const trend = [
-  { month: "Mar", value: 62 },
-  { month: "Abr", value: 68 },
-  { month: "Mai", value: 71 },
-  { month: "Jun", value: 69 },
-  { month: "Jul", value: 75 },
-  { month: "Ago", value: 89 },
-];
+// Indicador mostrado no gráfico de linha quando nada está selecionado.
+const DEFAULT_TREND_KPI = "NPS";
+
+const tooltipStyle = {
+  background: "var(--viz-surface)",
+  border: "1px solid var(--viz-border)",
+  borderRadius: 8,
+  color: "var(--viz-text-primary)",
+  fontSize: 12,
+};
 
 export default function Dashboard() {
+  const { data, loading, error, reload } = useApi<DashboardData>("/api/dashboard");
+
+  // "name" é a chave do filtro cruzado: clicar num card ou numa barra
+  // seleciona esse indicador e filtra a tabela e o gráfico de linha.
   const [selected, setSelected] = useState<string | null>(null);
 
   function toggleSelected(name: string) {
     setSelected((current) => (current === name ? null : name));
   }
 
+  const allKpis = useMemo(() => data?.kpis ?? [], [data]);
+  const featured = useMemo(() => allKpis.filter((k) => k.featured), [allKpis]);
+
   const visibleRows = useMemo(
-    () => (selected ? tableRows.filter((r) => r.name === selected) : tableRows),
-    [selected],
+    () => (selected ? allKpis.filter((r) => r.name === selected) : allKpis),
+    [selected, allKpis],
+  );
+
+  const trendKpi = useMemo(() => {
+    const withHistory = allKpis.filter((k) => k.history.length > 0);
+    return (
+      withHistory.find((k) => k.name === selected) ??
+      withHistory.find((k) => k.name === DEFAULT_TREND_KPI) ??
+      withHistory[0] ??
+      null
+    );
+  }, [allKpis, selected]);
+
+  const trendData = useMemo(
+    () => (trendKpi?.history ?? []).map((p) => ({ month: formatMonth(p.period), value: p.value })),
+    [trendKpi],
   );
 
   function exportCsv() {
     downloadCsv(
       selected ? `kpis-${selected.toLowerCase().replace(/\s+/g, "-")}.csv` : "kpis.csv",
-      ["Indicador", "Valor", "Variacao", "Atualizado em"],
-      visibleRows.map((r) => [r.name, r.value, r.delta, r.updatedAt]),
+      ["Indicador", "Valor", "Variação", "Atualizado em"],
+      visibleRows.map((r) => [
+        r.name,
+        formatKpiValue(r.value, r.unit),
+        formatVariation(r.variation),
+        formatDate(r.updated_at),
+      ]),
+    );
+  }
+
+  const header = (
+    <div className="page-header">
+      <div>
+        <div className="page-header__eyebrow">Visão geral</div>
+        <h1 className="page-header__title">Dashboard</h1>
+      </div>
+    </div>
+  );
+
+  if (loading && !data) {
+    return (
+      <div>
+        {header}
+        <div className="state-card">Carregando indicadores…</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div>
+        {header}
+        <div className="state-card state-card--error">
+          <div>
+            <strong>Não foi possível carregar o Dashboard.</strong>
+            <div className="state-card__detail">{error}</div>
+          </div>
+          <button type="button" className="btn" onClick={reload}>
+            Tentar de novo
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (allKpis.length === 0) {
+    return (
+      <div>
+        {header}
+        <div className="state-card">
+          Nenhum indicador cadastrado ainda. Cadastre em http://localhost:8000/docs (POST /api/kpis).
+        </div>
+      </div>
     );
   }
 
   return (
     <div>
-      <div className="page-header">
-        <div>
-          <div className="page-header__eyebrow">Visão geral</div>
-          <h1 className="page-header__title">Dashboard</h1>
-        </div>
-      </div>
+      {header}
 
       <div className="filter-bar">
         <span className="filter-bar__label">Filtros</span>
@@ -85,9 +166,10 @@ export default function Dashboard() {
       </div>
 
       <div className="kpi-grid">
-        {kpis.map((kpi) => {
+        {featured.map((kpi, i) => {
           const isSelected = selected === kpi.name;
           const isDimmed = selected !== null && !isSelected;
+          const isDown = kpi.variation < 0;
           return (
             <button
               type="button"
@@ -96,24 +178,21 @@ export default function Dashboard() {
                 (isSelected ? " kpi-card--selected" : "") +
                 (isDimmed ? " kpi-card--dimmed" : "")
               }
-              key={kpi.name}
-              style={{ ["--kpi-accent" as string]: kpi.accent }}
+              key={kpi.id}
+              style={{ ["--kpi-accent" as string]: ACCENTS[i % ACCENTS.length] }}
               onClick={() => toggleSelected(kpi.name)}
               aria-pressed={isSelected}
             >
               <div className="kpi-card__accent" />
               <div className="kpi-card__name">{kpi.name}</div>
-              <div className="kpi-card__value">{kpi.value}</div>
+              <div className="kpi-card__value">{formatKpiValue(kpi.value, kpi.unit)}</div>
               <div
                 className={
-                  "kpi-card__delta " +
-                  (kpi.delta.startsWith("-")
-                    ? "kpi-card__delta--down"
-                    : "kpi-card__delta--up")
+                  "kpi-card__delta " + (isDown ? "kpi-card__delta--down" : "kpi-card__delta--up")
                 }
               >
-                <span aria-hidden="true">{kpi.delta.startsWith("-") ? "▾" : "▴"}</span>
-                {kpi.delta}
+                <span aria-hidden="true">{isDown ? "▾" : "▴"}</span>
+                {formatVariation(kpi.variation)}
               </div>
             </button>
           );
@@ -125,9 +204,13 @@ export default function Dashboard() {
       </div>
       <div className="chart-grid">
         <div className="chart-card viz-root">
-          <div className="chart-card__title">KPIs (valores atuais) — clique numa barra pra filtrar</div>
+          {/* Cada KPI tem uma unidade (R$, %, pessoas...). Pra comparar no mesmo
+              gráfico, mostramos a VARIAÇÃO em %, que é comparável entre todos. */}
+          <div className="chart-card__title">
+            Variação vs. mês anterior (%) — clique numa barra pra filtrar
+          </div>
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={kpis} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
+            <BarChart data={featured} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
               <CartesianGrid vertical={false} stroke="var(--viz-grid)" />
               <XAxis
                 dataKey="name"
@@ -139,28 +222,25 @@ export default function Dashboard() {
                 tick={{ fill: "var(--viz-muted)", fontSize: 12 }}
                 axisLine={false}
                 tickLine={false}
-                width={40}
+                width={44}
+                tickFormatter={(v: number) => `${formatNumber(v)}%`}
               />
+              <ReferenceLine y={0} stroke="var(--viz-axis)" />
               <Tooltip
                 cursor={{ fill: "var(--viz-hover)" }}
-                contentStyle={{
-                  background: "var(--viz-surface)",
-                  border: "1px solid var(--viz-border)",
-                  borderRadius: 8,
-                  color: "var(--viz-text-primary)",
-                  fontSize: 12,
-                }}
+                contentStyle={tooltipStyle}
+                formatter={(v: number) => [formatVariation(v), "Variação"]}
               />
               <Bar
-                dataKey="chartValue"
+                dataKey="variation"
                 radius={[4, 4, 0, 0]}
                 maxBarSize={48}
-                onClick={(entry) => toggleSelected(entry.name as string)}
+                onClick={(entry) => toggleSelected((entry as unknown as DashboardKpi).name)}
                 cursor="pointer"
               >
-                {kpis.map((kpi) => (
+                {featured.map((kpi) => (
                   <Cell
-                    key={kpi.name}
+                    key={kpi.id}
                     fill="var(--viz-series-1)"
                     opacity={selected === null || selected === kpi.name ? 1 : 0.3}
                   />
@@ -171,9 +251,11 @@ export default function Dashboard() {
         </div>
 
         <div className="chart-card viz-root">
-          <div className="chart-card__title">NPS — últimos 6 meses</div>
+          <div className="chart-card__title">
+            {trendKpi ? `${trendKpi.name} — últimos ${trendData.length} meses` : "Sem histórico"}
+          </div>
           <ResponsiveContainer width="100%" height={260}>
-            <LineChart data={trend} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
+            <LineChart data={trendData} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
               <CartesianGrid vertical={false} stroke="var(--viz-grid)" />
               <XAxis
                 dataKey="month"
@@ -185,17 +267,17 @@ export default function Dashboard() {
                 tick={{ fill: "var(--viz-muted)", fontSize: 12 }}
                 axisLine={false}
                 tickLine={false}
-                width={32}
+                width={56}
+                domain={["auto", "auto"]}
+                tickFormatter={(v: number) => formatNumber(v)}
               />
               <Tooltip
                 cursor={{ stroke: "var(--viz-axis)", strokeWidth: 1 }}
-                contentStyle={{
-                  background: "var(--viz-surface)",
-                  border: "1px solid var(--viz-border)",
-                  borderRadius: 8,
-                  color: "var(--viz-text-primary)",
-                  fontSize: 12,
-                }}
+                contentStyle={tooltipStyle}
+                formatter={(v: number) => [
+                  trendKpi ? formatKpiValue(v, trendKpi.unit) : formatNumber(v),
+                  trendKpi?.name ?? "Valor",
+                ]}
               />
               <Line
                 type="monotone"
@@ -212,7 +294,8 @@ export default function Dashboard() {
 
       <div className="section-header">
         <span className="section-header__eyebrow">
-          Detalhamento {selected && <span className="section-header__count">({visibleRows.length})</span>}
+          Detalhamento{" "}
+          {selected && <span className="section-header__count">({visibleRows.length})</span>}
         </span>
         <button type="button" className="btn btn--export" onClick={exportCsv}>
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
@@ -239,13 +322,17 @@ export default function Dashboard() {
           </thead>
           <tbody>
             {visibleRows.map((row) => (
-              <tr key={row.name}>
+              <tr key={row.id}>
                 <td>{row.name}</td>
-                <td className="data-table__num">{row.value}</td>
-                <td className={row.delta.startsWith("-") ? "data-table__delta--down" : "data-table__delta--up"}>
-                  {row.delta}
+                <td className="data-table__num">{formatKpiValue(row.value, row.unit)}</td>
+                <td
+                  className={
+                    row.variation < 0 ? "data-table__delta--down" : "data-table__delta--up"
+                  }
+                >
+                  {formatVariation(row.variation)}
                 </td>
-                <td className="data-table__muted">{row.updatedAt}</td>
+                <td className="data-table__muted">{formatDate(row.updated_at)}</td>
               </tr>
             ))}
           </tbody>
