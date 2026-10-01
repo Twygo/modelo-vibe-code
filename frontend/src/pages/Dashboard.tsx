@@ -214,7 +214,8 @@ export default function Dashboard() {
               <CartesianGrid vertical={false} stroke="var(--viz-grid)" />
               <XAxis
                 dataKey="name"
-                tick={{ fill: "var(--viz-muted)", fontSize: 12 }}
+                interval={0}
+                tick={{ fill: "var(--viz-muted)", fontSize: 11 }}
                 axisLine={{ stroke: "var(--viz-axis)" }}
                 tickLine={false}
               />
