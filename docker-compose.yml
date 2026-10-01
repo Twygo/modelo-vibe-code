@@ -25,7 +25,8 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://kpi:kpi@postgres:5432/kpidb}
+      # Montada a partir das variáveis POSTGRES_* do .env (a senha fica num lugar só).
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-kpi}:${POSTGRES_PASSWORD:-kpi}@postgres:5432/${POSTGRES_DB:-kpidb}
     volumes:
       - ./backend/app:/app/app
 
