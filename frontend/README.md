@@ -1,30 +1,30 @@
-# KPI Boilerplate — Frontend
+# Frontend
 
-React + TypeScript + Vite. Layout de dashboard com navbar, sidebar e área de conteúdo, consumindo `GET /api/kpis` do backend FastAPI.
+React 18 + TypeScript + Vite + Recharts. Layout com navbar, sidebar e área de conteúdo.
+A página **Dashboard** busca os dados em `GET /api/dashboard` do backend (via
+`useApi` de `src/lib/api.ts`) e mostra carregando/erro/vazio.
 
-## Rodando localmente (sem Docker)
+## Como rodar
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+Use `make up` na raiz do projeto (tudo roda no Docker). O Vite encaminha (proxy) tudo que
+começa com `/api` para o backend (`VITE_API_TARGET`, padrão `http://backend:8000` no compose).
 
-Acesse http://localhost:5173. O Vite faz proxy de `/api` para `http://localhost:8000` (backend FastAPI deve estar rodando nessa porta).
-
-## Rodando com Docker
-
-```bash
-cd frontend
-docker build -t kpi-frontend .
-docker run -p 5173:5173 -e VITE_API_TARGET=http://backend:8000 kpi-frontend
-```
-
-Se o backend estiver em outro serviço/host dentro de uma rede docker (ex: docker-compose), defina `VITE_API_TARGET` com a URL correta (ex: `http://backend:8000`). Se não definido, usa `http://localhost:8000`.
+Para devs que queiram rodar fora do Docker: `npm ci && VITE_API_TARGET=http://localhost:8000 npm run dev`.
 
 ## Estrutura
 
-- `src/layout/AppLayout.tsx` — compõe Navbar + Sidebar + conteúdo (via `<Outlet/>` do react-router).
-- `src/components/Navbar.tsx`, `src/components/Sidebar.tsx` — navbar superior e menu lateral.
-- `src/pages/` — páginas roteadas: Dashboard, KPIs, Configurações.
-- `src/styles.css` — estilos globais do layout.
+- `src/App.tsx` — rotas (`<Route path="/..." element={...} />`).
+- `src/layout/AppLayout.tsx` — Navbar + Sidebar + conteúdo (`<Outlet/>`).
+- `src/components/Navbar.tsx` — barra do topo (textos em `src/config.ts`).
+- `src/components/Sidebar.tsx` — menu lateral (`NAV_ITEMS`).
+- `src/pages/` — páginas: Dashboard (referência), KPIs, Configurações.
+- `src/lib/api.ts` — `api.get/post/put/delete/upload` e hook `useApi`.
+- `src/lib/format.ts` — formatação pt-BR (número, R$, %, data, mês).
+- `src/lib/csv.ts` — `downloadCsv` (exportar tabela).
+- `src/styles.css` — estilos globais e tokens de cor (`--series-*`, `--viz-*`).
+
+## Adicionar uma página
+
+1. Crie `src/pages/MinhaPagina.tsx`.
+2. Registre a rota em `src/App.tsx`: `<Route path="/minha-pagina" element={<MinhaPagina />} />`.
+3. Adicione o item em `NAV_ITEMS` de `src/components/Sidebar.tsx`.

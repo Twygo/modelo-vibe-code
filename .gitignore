@@ -25,3 +25,6 @@ venv/
 
 # TypeScript build cache
 *.tsbuildinfo
+
+# Planilhas e dados reais (LGPD) — nunca versionar
+dados/
