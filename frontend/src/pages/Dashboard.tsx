@@ -1,7 +1,9 @@
+import { useMemo, useState } from "react";
 import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -12,21 +14,21 @@ import {
 import { downloadCsv } from "../lib/csv";
 
 // Dados mockados — trocar por fetch em /api/kpis (ou /api/kpis/mock) quando
-// o backend tiver dados reais. Mantido estático aqui pra pagina renderizar
-// sem depender da API estar de pe.
-const kpiCards = [
-  { id: 1, name: "Usuarios ativos", value: "1.200", delta: "+5.4%", accent: "var(--series-1)" },
-  { id: 2, name: "Receita mensal", value: "R$ 89.500", delta: "-2.1%", accent: "var(--series-2)" },
-  { id: 3, name: "Churn", value: "3,2%", delta: "+0.5%", accent: "var(--series-3)" },
-  { id: 4, name: "NPS", value: "89", delta: "+18.7%", accent: "var(--series-4)" },
+// o backend tiver dados reais. "name" é a chave de cross-filter: clicar num
+// card ou numa barra seleciona esse indicador e filtra a tabela abaixo.
+const kpis = [
+  { name: "Usuarios ativos", value: "1.200", chartValue: 1200, delta: "+5.4%", accent: "var(--series-1)", updatedAt: "2026-08-21" },
+  { name: "Receita mensal", value: "R$ 89.500,00", chartValue: 895, delta: "-2.1%", accent: "var(--series-2)", updatedAt: "2026-08-21" },
+  { name: "Churn", value: "3,2%", chartValue: 32, delta: "+0.5%", accent: "var(--series-3)", updatedAt: "2026-08-20" },
+  { name: "NPS", value: "89", chartValue: 89, delta: "+18.7%", accent: "var(--series-4)", updatedAt: "2026-08-19" },
 ];
 
-const kpiValues = [
-  { name: "Usuarios ativos", value: 1200 },
-  { name: "Receita (x100)", value: 895 },
-  { name: "Churn (x100)", value: 32 },
-  { name: "NPS", value: 89 },
+const extraRows = [
+  { name: "Ticket medio", value: "R$ 149,90", delta: "+1.2%", updatedAt: "2026-08-18" },
+  { name: "Tempo de resposta (h)", value: "3,4", delta: "-9.8%", updatedAt: "2026-08-18" },
 ];
+
+const tableRows = [...kpis, ...extraRows];
 
 const trend = [
   { month: "Mar", value: 62 },
@@ -37,24 +39,26 @@ const trend = [
   { month: "Ago", value: 89 },
 ];
 
-const tableRows = [
-  { name: "Usuarios ativos", value: "1.200", delta: "+5.4%", updatedAt: "2026-08-21" },
-  { name: "Receita mensal", value: "R$ 89.500,00", delta: "-2.1%", updatedAt: "2026-08-21" },
-  { name: "Churn", value: "3,2%", delta: "+0.5%", updatedAt: "2026-08-20" },
-  { name: "NPS", value: "89", delta: "+18.7%", updatedAt: "2026-08-19" },
-  { name: "Ticket medio", value: "R$ 149,90", delta: "+1.2%", updatedAt: "2026-08-18" },
-  { name: "Tempo de resposta (h)", value: "3,4", delta: "-9.8%", updatedAt: "2026-08-18" },
-];
-
-function exportTableCsv() {
-  downloadCsv(
-    "kpis.csv",
-    ["Indicador", "Valor", "Variacao", "Atualizado em"],
-    tableRows.map((r) => [r.name, r.value, r.delta, r.updatedAt]),
-  );
-}
-
 export default function Dashboard() {
+  const [selected, setSelected] = useState<string | null>(null);
+
+  function toggleSelected(name: string) {
+    setSelected((current) => (current === name ? null : name));
+  }
+
+  const visibleRows = useMemo(
+    () => (selected ? tableRows.filter((r) => r.name === selected) : tableRows),
+    [selected],
+  );
+
+  function exportCsv() {
+    downloadCsv(
+      selected ? `kpis-${selected.toLowerCase().replace(/\s+/g, "-")}.csv` : "kpis.csv",
+      ["Indicador", "Valor", "Variacao", "Atualizado em"],
+      visibleRows.map((r) => [r.name, r.value, r.delta, r.updatedAt]),
+    );
+  }
+
   return (
     <div>
       <div className="page-header">
@@ -64,25 +68,56 @@ export default function Dashboard() {
         </div>
       </div>
 
+      <div className="filter-bar">
+        <span className="filter-bar__label">Filtros</span>
+        {selected ? (
+          <button type="button" className="filter-chip" onClick={() => setSelected(null)}>
+            Indicador: <strong>{selected}</strong>
+            <span className="filter-chip__x" aria-hidden="true">
+              ×
+            </span>
+          </button>
+        ) : (
+          <span className="filter-bar__hint">
+            Nenhum filtro aplicado — clique num card ou numa barra do gráfico pra filtrar
+          </span>
+        )}
+      </div>
+
       <div className="kpi-grid">
-        {kpiCards.map((kpi) => (
-          <div className="kpi-card" key={kpi.id} style={{ ["--kpi-accent" as string]: kpi.accent }}>
-            <div className="kpi-card__accent" />
-            <div className="kpi-card__name">{kpi.name}</div>
-            <div className="kpi-card__value">{kpi.value}</div>
-            <div
+        {kpis.map((kpi) => {
+          const isSelected = selected === kpi.name;
+          const isDimmed = selected !== null && !isSelected;
+          return (
+            <button
+              type="button"
               className={
-                "kpi-card__delta " +
-                (kpi.delta.startsWith("-")
-                  ? "kpi-card__delta--down"
-                  : "kpi-card__delta--up")
+                "kpi-card" +
+                (isSelected ? " kpi-card--selected" : "") +
+                (isDimmed ? " kpi-card--dimmed" : "")
               }
+              key={kpi.name}
+              style={{ ["--kpi-accent" as string]: kpi.accent }}
+              onClick={() => toggleSelected(kpi.name)}
+              aria-pressed={isSelected}
             >
-              <span aria-hidden="true">{kpi.delta.startsWith("-") ? "▾" : "▴"}</span>
-              {kpi.delta}
-            </div>
-          </div>
-        ))}
+              <div className="kpi-card__accent" />
+              <div className="kpi-card__name">{kpi.name}</div>
+              <div className="kpi-card__value">{kpi.value}</div>
+              <div
+                className={
+                  "kpi-card__delta " +
+                  (kpi.delta.startsWith("-")
+                    ? "kpi-card__delta--down"
+                    : "kpi-card__delta--up")
+                }
+              >
+                <span aria-hidden="true">{kpi.delta.startsWith("-") ? "▾" : "▴"}</span>
+                {kpi.delta}
+              </div>
+            </button>
+          );
+        })}
       </div>
 
       <div className="section-header">
@@ -90,9 +125,9 @@ export default function Dashboard() {
       </div>
       <div className="chart-grid">
         <div className="chart-card viz-root">
-          <div className="chart-card__title">KPIs (valores atuais)</div>
+          <div className="chart-card__title">KPIs (valores atuais) — clique numa barra pra filtrar</div>
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={kpiValues} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
+            <BarChart data={kpis} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
               <CartesianGrid vertical={false} stroke="var(--viz-grid)" />
               <XAxis
                 dataKey="name"
@@ -116,7 +151,21 @@ export default function Dashboard() {
                   fontSize: 12,
                 }}
               />
-              <Bar dataKey="value" fill="var(--viz-series-1)" radius={[4, 4, 0, 0]} maxBarSize={48} />
+              <Bar
+                dataKey="chartValue"
+                radius={[4, 4, 0, 0]}
+                maxBarSize={48}
+                onClick={(entry) => toggleSelected(entry.name as string)}
+                cursor="pointer"
+              >
+                {kpis.map((kpi) => (
+                  <Cell
+                    key={kpi.name}
+                    fill="var(--viz-series-1)"
+                    opacity={selected === null || selected === kpi.name ? 1 : 0.3}
+                  />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -162,8 +211,10 @@ export default function Dashboard() {
       </div>
 
       <div className="section-header">
-        <span className="section-header__eyebrow">Detalhamento</span>
-        <button type="button" className="btn btn--export" onClick={exportTableCsv}>
+        <span className="section-header__eyebrow">
+          Detalhamento {selected && <span className="section-header__count">({visibleRows.length})</span>}
+        </span>
+        <button type="button" className="btn btn--export" onClick={exportCsv}>
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
             <path
               d="M7 1v8m0 0L4 6.5M7 9l3-2.5M2 11.5h10"
@@ -187,7 +238,7 @@ export default function Dashboard() {
             </tr>
           </thead>
           <tbody>
-            {tableRows.map((row) => (
+            {visibleRows.map((row) => (
               <tr key={row.name}>
                 <td>{row.name}</td>
                 <td className="data-table__num">{row.value}</td>
