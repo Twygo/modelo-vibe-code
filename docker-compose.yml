@@ -27,6 +27,8 @@ services:
     environment:
       # Montada a partir das variáveis POSTGRES_* do .env (a senha fica num lugar só).
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-kpi}:${POSTGRES_PASSWORD:-kpi}@postgres:5432/${POSTGRES_DB:-kpidb}
+      # Token da API da Twygo (opcional). Fica só no backend, nunca vai pro navegador.
+      TWYGO_API_TOKEN: ${TWYGO_API_TOKEN:-}
     volumes:
       - ./backend/app:/app/app
 

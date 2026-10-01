@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.db import Base, SessionLocal, engine
-from app.routers import dashboard, kpis
+from app.routers import dashboard, kpis, twygo
 from app.seed import seed_if_empty
 
 
@@ -37,3 +37,4 @@ def health():
 # Registre aqui cada novo router criado em app/routers/.
 app.include_router(dashboard.router)
 app.include_router(kpis.router)
+app.include_router(twygo.router)
