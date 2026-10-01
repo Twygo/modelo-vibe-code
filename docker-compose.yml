@@ -5,8 +5,10 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-kpi}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kpi}
       POSTGRES_DB: ${POSTGRES_DB:-kpidb}
-    ports:
-      - "5432:5432"
+    # Sem porta publicada: o backend fala com o banco pela rede interna do Docker.
+    # Se precisar abrir o banco num cliente SQL (DBeaver, TablePlus...), descomente:
+    # ports:
+    #   - "127.0.0.1:5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -18,7 +20,7 @@ services:
   backend:
     build: ./backend
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -30,7 +32,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "5173:5173"
+      - "127.0.0.1:5173:5173"
     depends_on:
       - backend
     environment:
