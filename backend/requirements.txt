@@ -1,6 +1,14 @@
-fastapi
-uvicorn[standard]
-sqlalchemy
-psycopg[binary]
-pydantic
-python-dotenv
+# Versões fixas = todo mundo roda exatamente a mesma coisa.
+# Mudou algo aqui? Rode `make up` de novo (ele reconstrói a imagem).
+fastapi==0.142.2
+uvicorn[standard]==0.54.0
+sqlalchemy==2.1.1
+psycopg[binary]==3.3.6
+pydantic==2.13.5
+python-dotenv==1.2.4
+# chamadas HTTP a APIs externas (ex.: integração Twygo)
+httpx==0.28.1
+# upload de arquivos (importar CSV/XLSX)
+python-multipart==0.0.32
+# leitura de planilhas .xlsx
+openpyxl==3.1.5
