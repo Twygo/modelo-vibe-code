@@ -1,0 +1,16 @@
+# Build de produção: node compila, nginx serve. O Dockerfile (sem sufixo)
+# continua sendo o de desenvolvimento (vite dev server com hot-reload) —
+# este aqui é só pro Dokploy, seguindo o mesmo padrão de dois estágios do
+# frontend do JPMO.
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY proxy.inc /etc/nginx/conf.d/proxy.inc
+EXPOSE 80

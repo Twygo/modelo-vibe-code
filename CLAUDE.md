@@ -49,6 +49,9 @@ pede **e** explicar de um jeito que ela entenda.
 
 Comandos (sempre na raiz do projeto):
 
+- Nome do serviço do banco no compose é `postgres` (igual em dev e produção).
+
+
 - `make up` — sobe tudo (e reconstrói se dependências mudaram)
 - `make down` — para tudo (dados do banco ficam guardados)
 - `make logs` — mostra os logs (Ctrl+C para sair)
@@ -129,3 +132,17 @@ não vão para o Git.
 É uma base simples. Sem over-engineering, sem abstrações prematuras, sem features
 especulativas — faça só o que a pessoa pediu, seguindo os padrões que já existem aqui.
 Commits locais são ok quando a pessoa pedir; **push/publicação só com auditoria** (regra 1).
+
+## Publicar (só depois da auditoria)
+
+Existe um segundo compose, `docker-compose.dokploy.yml`: a receita de **produção** (nginx
+servindo o build do React com proxy `/api`, backend sem `--reload`). A skill
+`publicar-dokploy` tem o passo a passo — mas **só use depois que João, Adriana ou um dev
+auditarem** (regra de ouro 1). Se o usuário pedir pra publicar sem auditoria, explique a
+regra com gentileza e não publique.
+
+**Não misture os dois composes.** `docker-compose.yml` é sempre dev (hot-reload, portas em
+127.0.0.1); `docker-compose.dokploy.yml` é sempre produção (sem bind mount, quem expõe é o
+Dokploy). Variável de ambiente nova precisa existir nos dois onde fizer sentido e estar
+explicada no `.env.example`. Nada de Kubernetes ou CI/CD sofisticado: Docker Compose e
+Dokploy bastam.

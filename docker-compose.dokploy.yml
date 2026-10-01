@@ -1,0 +1,55 @@
+# Compose de PRODUÇÃO, pro Dokploy. O docker-compose.yml da raiz continua
+# sendo o de desenvolvimento (hot-reload, portas expostas em localhost) — os
+# dois convivem, cada um com seu papel. Ver .claude/skills/publicar-dokploy/.
+#
+# Ao clonar este boilerplate pra um projeto novo, troque os nomes genéricos
+# (db/backend/frontend) e as credenciais por algo específico do seu projeto
+# se for rodar mais de uma instância no mesmo servidor Dokploy — como está,
+# funciona pra uma instância isolada por projeto no Dokploy.
+services:
+  # Mesmo nome de serviço do docker-compose.yml de dev (`postgres`), de
+  # propósito: script ou doc que fale de um fala do outro sem precisar de
+  # tradução.
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      TZ: America/Sao_Paulo
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    # Mesma imagem do Dockerfile de dev, sem --reload: watch de arquivo não
+    # tem função em produção (nada muda o código de dentro do container) e só
+    # custa CPU.
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      TZ: America/Sao_Paulo
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dokploy
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+volumes:
+  db_data:

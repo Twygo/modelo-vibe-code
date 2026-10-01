@@ -1,4 +1,4 @@
-# kpi-boilerplate
+# Modelo - Vibe code
 
 Base pronta para criar **dashboards de indicadores** e **ferramentas internas** da Twygo
 conversando com o **Claude Code** — mesmo sem saber programar.
@@ -129,3 +129,5 @@ a fazer isso.
 - Integração Twygo de exemplo: `GET /api/twygo/users` (precisa de `TWYGO_API_TOKEN` no
   `.env`; sem token responde 503).
 - Instruções para o agente: `CLAUDE.md`. Skills em `.claude/skills/`.
+- **Publicar (produção):** `docker-compose.dokploy.yml` + skill `.claude/skills/publicar-dokploy/`
+  — **só depois da auditoria** (regra de ouro 1).
