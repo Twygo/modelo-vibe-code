@@ -66,22 +66,38 @@ precisa de `make up` de novo quando mudar dependências, `docker-compose.yml` ou
 
 - `frontend/src/pages/` — uma página por arquivo (`Dashboard.tsx` é o **exemplo de referência**).
 - `frontend/src/App.tsx` — lista de rotas (`<Route path="/x" element={<X />} />`).
-- `frontend/src/components/Sidebar.tsx` — itens do menu lateral (`NAV_ITEMS`).
+- `frontend/src/components/Sidebar.tsx` — menu lateral no padrão Twygo: módulos e itens em `NAV_MODULES` (ícones = nomes do Material Symbols).
 - `frontend/src/lib/api.ts` — `api.get/post/put/delete/upload` e o hook `useApi` (chamadas
   sempre em `/api/...`, o Vite encaminha para o backend).
 - `frontend/src/lib/format.ts` — formatação BR (números, R$, %, datas, meses).
 - `frontend/src/lib/csv.ts` — `downloadCsv` para botões "Exportar CSV".
-- `frontend/src/config.ts` — título do app e nome do usuário na navbar.
-- `frontend/src/styles.css` — todos os estilos.
+- `frontend/src/config.ts` — título do app, nome do usuário e cor principal (`primaryColor`).
+- `frontend/src/twygo-ui.css` — design system da Twygo (classes `twg-*`). Não edite: é cópia de `.claude/skills/twygo-design-system/assets/twygo-ui.css`.
+- `frontend/src/styles.css` — estilos próprios do boilerplate, já no visual Twygo.
 - `backend/app/routers/` — um arquivo por grupo de endpoints (`dashboard.py` é a referência).
 - `backend/app/main.py` — registra os routers (`app.include_router(...)`).
 - `backend/app/models.py` — tabelas do banco. `backend/app/schemas.py` — formato das respostas.
 - `backend/app/seed.py` — dados de exemplo inseridos quando o banco está vazio.
 - `backend/app/routers/twygo.py` — exemplo de integração com a API da Twygo (token no `.env`).
 
-## Reaproveite o visual existente
+## Reaproveite o visual existente (design system Twygo)
 
-Não invente estilos novos se já existe um. Use:
+O app já sai com a cara da plataforma Twygo: menu novo de duas colunas, fonte Lato, ícones
+Material Symbols e cor principal roxa. **Toda tela nova segue a skill `twygo-design-system`**
+— leia o `SKILL.md` dela antes de criar ou mudar uma tela. Não invente estilos, fontes,
+bibliotecas de ícones ou cores novas. Use:
+
+- Ícones: `<span className="twg-icon">nome_do_icone</span>` (Material Symbols). Nada de SVG
+  desenhado à mão, emoji, lucide ou react-icons.
+- Listas e cadastros: toolbar `twg-toolbar` (Adicionar à esquerda, busca e Filtrar à
+  direita), tabela `twg-table` ou `data-table`, status em `twg-badge`, ações da linha no
+  menu `more_vert`, paginação `twg-pagination`.
+- Abas `twg-tabs`, formulários `twg-field`/`twg-input`/`twg-select`, botões `twg-btn`
+  (`--primary` ação principal, `--outline` secundária), formulário de criar/editar em drawer
+  `twg-drawer`, confirmação em `twg-modal`, aviso em `twg-toast`.
+- Exemplo vivo de tudo isso: `.claude/skills/twygo-design-system/assets/preview.html`.
+
+Classes próprias do boilerplate (já no mesmo visual):
 
 - Cabeçalho de página: `page-header`, `page-header__eyebrow`, `page-header__title`.
 - Cards de número: `kpi-grid` + `kpi-card` (`kpi-card__name`, `kpi-card__value`,
@@ -112,7 +128,8 @@ Não invente estilos novos se já existe um. Use:
    `const { data, loading, error, reload } = useApi<Tipo>("/api/<nome>")`, com os estados de
    carregando/erro iguais ao Dashboard.
 5. Adicione a rota em `frontend/src/App.tsx`: `<Route path="/<nome>" element={<Nome />} />`.
-6. Adicione o item no menu em `frontend/src/components/Sidebar.tsx` (`NAV_ITEMS`).
+6. Adicione o item no menu em `frontend/src/components/Sidebar.tsx` (`NAV_MODULES`), com um
+   ícone do Material Symbols.
 7. Valide os tipos com `docker compose exec frontend npx tsc -b` (roda dentro do container,
    não instala nada na máquina) e diga para a pessoa abrir http://localhost:5173/<nome>.
 

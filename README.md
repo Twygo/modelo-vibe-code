@@ -8,7 +8,9 @@ constrói, e você vê o resultado no seu navegador, **na sua máquina**. Nada v
 internet.
 
 O projeto já vem com um Dashboard de exemplo (cards, gráficos, filtro clicável, tabela e
-botão de exportar CSV) usando dados **fictícios**.
+botão de exportar CSV) usando dados **fictícios** — e já com a **cara da plataforma Twygo**:
+menu novo de duas colunas, fonte Lato, ícones Material e roxo Twygo. Toda tela que o Claude
+criar segue o design system da Twygo (skill `twygo-design-system`).
 
 ---
 
@@ -92,11 +94,36 @@ dados locais, que são só de teste).
 3. *"No Dashboard, adiciona um filtro por mês e faz o botão Exportar CSV respeitar o filtro."*
 4. *"Cria uma página de acompanhamento de projetos do PMO com status (no prazo, atrasado,
    concluído), uma tabela e um gráfico de pizza por status."*
-5. *"Troca o título do sistema para 'Painel de RH' e coloca meu nome no canto superior
-   direito."*
+5. *"Troca o título do sistema para 'Painel de RH' e coloca meu nome no rodapé do menu."*
 
 Dica: comece pedindo para o Claude **explicar o plano** antes de mexer — ele já é instruído
 a fazer isso.
+
+## Já tem um projeto feito antes? Deixe ele com a cara da Twygo
+
+Abra o Claude Code **na pasta do seu projeto** e cole este prompt:
+
+```text
+Quero que este projeto fique com a cara da plataforma Twygo (menu, abas, listas,
+formulários, cores e fonte).
+
+1. Baixe a skill de design system da Twygo: clone o repositório privado
+   https://github.com/Twygo/modelo-vibe-code (git clone --depth 1) numa pasta temporária
+   fora deste projeto e copie a pasta .claude/skills/twygo-design-system para
+   .claude/skills/ deste projeto. Depois apague a pasta temporária.
+2. Leia .claude/skills/twygo-design-system/SKILL.md e as referências que ela indicar.
+   Abra assets/preview.html no navegador para ver como deve ficar.
+3. Antes de mudar qualquer arquivo, me explique em poucos tópicos o que vai mudar (menu,
+   cores, fonte, botões, tabelas) e espere eu dizer ok.
+4. Aplique: use o assets/twygo-ui.css, troque o menu atual pelo menu novo da Twygo
+   (faixa de módulos colorida + painel de itens) e ajuste as telas para os padrões da
+   skill. Mantenha todas as páginas e funcionalidades que já existem, não troque a
+   tecnologia do projeto, não instale bibliotecas novas e não apague dados.
+5. No fim, me diga como abrir o sistema para ver e o que mudou em cada tela.
+```
+
+Se der erro de acesso no passo 1, peça acesso ao repositório `Twygo/modelo-vibe-code` para
+o João ou a Adriana.
 
 ## Regras de ouro
 

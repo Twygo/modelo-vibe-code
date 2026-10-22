@@ -90,14 +90,18 @@ export default function Kpis() {
         </div>
       </div>
 
-      <form onSubmit={criar} style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+      <form onSubmit={criar} className="twg-toolbar">
         <input
+          className="twg-input"
+          style={{ maxWidth: 320 }}
           placeholder="Nome do indicador"
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           required
         />
         <input
+          className="twg-input"
+          style={{ maxWidth: 160 }}
           placeholder="Valor"
           type="number"
           step="any"
@@ -105,7 +109,9 @@ export default function Kpis() {
           onChange={(e) => setValor(e.target.value)}
           required
         />
-        <button type="submit" className="btn">Adicionar</button>
+        <button type="submit" className="twg-btn twg-btn--primary">
+          <span className="twg-icon">add</span>Adicionar
+        </button>
       </form>
 
       {erro && <p className="error">{erro}</p>}
@@ -176,9 +182,9 @@ novos + 2 arquivos existentes tocados:
 5. `frontend/src/pages/Metas.tsx` — copie o `Kpis.tsx` acabado de escrever
    (seção acima) e ajuste os campos.
 6. `frontend/src/App.tsx` — `<Route path="/metas" element={<Metas />} />`.
-7. `frontend/src/components/Sidebar.tsx` — um ícone SVG (copie o padrão dos
-   três existentes: `viewBox="0 0 18 18"`, `stroke`/`fill="currentColor"`) e
-   uma entrada em `NAV_ITEMS`.
+7. `frontend/src/components/Sidebar.tsx` — uma entrada no módulo certo de
+   `NAV_MODULES`: `{ to: "/metas", label: "Metas", icon: "flag" }` (`icon` é um
+   nome do Material Symbols).
 
 Teste do mesmo jeito: `make up`, `curl -s http://localhost:8000/api/metas`
 antes de mexer no front (confirma que o backend está de pé sozinho), depois
@@ -200,8 +206,9 @@ adiante isso aqui à toa. Três telas simples não precisam de quatro camadas.
 - Português nos textos de tela (labels, títulos), inglês no código (nomes de
   variável, função, classe) — mesmo padrão dos arquivos existentes.
 - Classes CSS em `kebab-case` com BEM (`__elemento`, `--modificador`) — ver
-  `frontend/src/styles.css`. Reuse `page-header`, `table-card`/`data-table`,
-  `kpi-card`, `chart-card`, `btn` antes de inventar uma classe nova.
+  `frontend/src/styles.css`. Visual segue a skill `twygo-design-system`: reuse
+  `page-header`, `table-card`/`data-table`, `kpi-card`, `chart-card`, `btn` e as
+  classes `twg-*` antes de inventar uma classe nova.
 - `end={true}` no `NavLink` só pra rota `/` (senão ela fica "ativa" em
   qualquer outra rota, porque `/` é prefixo de tudo).
 - Toda tela nova: primeiro confirme a API com `curl` (isolando se o problema
