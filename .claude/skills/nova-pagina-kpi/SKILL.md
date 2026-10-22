@@ -118,8 +118,8 @@ export default function <Nome>() {
 }
 ```
 
-Regras visuais: só classes existentes (`kpi-card`, `chart-card`, `data-table`,
-`filter-chip`, `state-card`, `btn`) e cores `var(--viz-series-N)` dentro de gráficos.
+Regras visuais: siga a skill `twygo-design-system`; só classes existentes (`kpi-card`, `chart-card`, `data-table`,
+`filter-chip`, `state-card`, `btn` e as `twg-*`) e cores `var(--viz-series-N)` dentro de gráficos.
 Não misture unidades diferentes no mesmo eixo de gráfico. Formate números com
 `lib/format.ts` (padrão brasileiro).
 
@@ -127,9 +127,9 @@ Não misture unidades diferentes no mesmo eixo de gráfico. Formate números com
 
 - `frontend/src/App.tsx`: importe a página e adicione dentro do `<Route element={<AppLayout />}>`:
   `<Route path="/<slug>" element={<Nome />} />`
-- `frontend/src/components/Sidebar.tsx`: adicione em `NAV_ITEMS`
-  `{ to: "/<slug>", label: "<Título>", end: false, icon: <KpiIcon /> }` (reaproveite um
-  ícone existente ou crie um SVG pequeno no mesmo estilo).
+- `frontend/src/components/Sidebar.tsx`: adicione no módulo certo de `NAV_MODULES`
+  `{ to: "/<slug>", label: "<Título>", icon: "<icone>" }` — `icon` é um nome do Material
+  Symbols (ex.: `bar_chart`, `groups`, `school`, `trending_up`).
 
 ## 4. Verificar e avisar
 

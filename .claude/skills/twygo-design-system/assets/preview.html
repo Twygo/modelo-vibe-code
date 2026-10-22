@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Twygo UI Preview</title>
+  <link rel="stylesheet" href="twygo-ui.css" />
+</head>
+<body>
+<div class="twg-shell">
+  <nav class="twg-shell__nav" aria-label="Menu principal">
+    <div class="twg-rail">
+      <button class="twg-rail__item twg-tooltip" data-tip="Meu espaço" aria-label="Meu espaço"><span class="twg-icon">person</span></button>
+      <button class="twg-rail__item twg-tooltip" data-tip="Aprendizagem" aria-label="Aprendizagem"><span class="twg-icon">menu_book</span></button>
+      <button class="twg-rail__item twg-tooltip" data-tip="Pessoas" aria-label="Pessoas"><span class="twg-icon">group</span></button>
+      <button class="twg-rail__item twg-tooltip" data-tip="Desenvolvimento" aria-label="Desenvolvimento" aria-current="true"><span class="twg-icon">trending_up</span></button>
+      <button class="twg-rail__item twg-tooltip" data-tip="Configurações" aria-label="Configurações"><span class="twg-icon">tune</span></button>
+    </div>
+
+    <div class="twg-panel" id="panel">
+      <div class="twg-panel__brand"><span class="twg-panel__brand-name">Acme</span></div>
+      <div class="twg-panel__header">
+        <span class="twg-panel__module-title">Desenvolvimento</span>
+        <button class="twg-panel__toggle" id="panel-toggle" aria-label="Recolher menu"><span class="twg-icon">chevron_right</span></button>
+      </div>
+      <div class="twg-panel__items">
+        <a class="twg-nav-item" href="#"><span class="twg-icon">dashboard</span><span class="twg-nav-item__label">Painel</span></a>
+        <a class="twg-nav-item" href="#" aria-current="page"><span class="twg-icon">event_repeat</span><span class="twg-nav-item__label">Ciclos de avaliação</span></a>
+        <div class="twg-nav-group">
+          <button class="twg-nav-item" data-group-toggle aria-expanded="true">
+            <span class="twg-icon">monitoring</span><span class="twg-nav-item__label">Planos e metas</span>
+            <span class="twg-icon twg-nav-item__chevron">expand_more</span>
+          </button>
+          <div class="twg-nav-group__children">
+            <a class="twg-nav-item" href="#"><span class="twg-icon">flag</span><span class="twg-nav-item__label">PDI</span></a>
+            <a class="twg-nav-item" href="#"><span class="twg-icon">grid_view</span><span class="twg-nav-item__label">Nine box</span><span class="twg-nav-badge twg-nav-badge--new">novo</span></a>
+          </div>
+        </div>
+        <a class="twg-nav-item" href="#"><span class="twg-icon">psychology</span><span class="twg-nav-item__label">Competências</span><span class="twg-nav-badge twg-nav-badge--beta">beta</span></a>
+      </div>
+      <div class="twg-panel__footer">
+        <div class="twg-utility-actions">
+          <button class="twg-utility-action" aria-label="Academy"><span class="twg-icon">school</span></button>
+          <button class="twg-utility-action" aria-label="Chat"><span class="twg-icon">forum</span></button>
+          <button class="twg-utility-action" aria-label="Notificações"><span class="twg-icon">notifications</span></button>
+        </div>
+        <button class="twg-account"><span class="twg-avatar">MS</span><span class="twg-account__name">Maria Souza</span></button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="twg-shell__content">
+    <div class="twg-page">
+      <div class="twg-tabs" data-test-id="cycles-tabs">
+        <div class="twg-tabs__list" role="tablist">
+          <button class="twg-tab" role="tab" aria-selected="true" data-test-id="cycles-tab-all">Todos os ciclos</button>
+          <button class="twg-tab" role="tab" aria-selected="false" data-test-id="cycles-tab-adoption">Adesão<span class="twg-tab__dot"></span></button>
+        </div>
+
+        <div class="twg-tabs__panel">
+          <div class="twg-kpi-grid">
+            <div class="twg-kpi" style="--twg-kpi-color:#7f27d8"><div><span class="twg-kpi__value">12</span><span class="twg-kpi__pct">100%</span></div><div class="twg-kpi__label">Total de ciclos</div></div>
+            <div class="twg-kpi" style="--twg-kpi-color:#48bb78"><div><span class="twg-kpi__value">5</span><span class="twg-kpi__pct">42%</span></div><div class="twg-kpi__label">Ativos</div></div>
+            <div class="twg-kpi" style="--twg-kpi-color:#dd6b20"><div><span class="twg-kpi__value">3</span><span class="twg-kpi__pct">25%</span></div><div class="twg-kpi__label">Agendados</div></div>
+            <div class="twg-kpi" style="--twg-kpi-color:#718096"><div><span class="twg-kpi__value">4</span><span class="twg-kpi__pct">33%</span></div><div class="twg-kpi__label">Rascunhos</div></div>
+          </div>
+
+          <div class="twg-toolbar">
+            <div class="twg-toolbar__left">
+              <button class="twg-btn twg-btn--primary twg-btn--responsive" data-open="drawer" data-test-id="cycles-add-button"><span class="twg-icon">add</span><span class="twg-btn__label">Criar ciclo</span></button>
+              <button class="twg-btn twg-btn--outline" data-test-id="cycles-mass-actions-button">Ações em massa</button>
+            </div>
+            <div class="twg-toolbar__right">
+              <label class="twg-search"><span class="twg-icon">search</span><input class="twg-input" placeholder="Pesquise aqui" data-test-id="cycles-search-input" /></label>
+              <button class="twg-btn twg-btn--outline" data-test-id="cycles-filter-button"><span class="twg-icon">filter_alt</span>Filtrar</button>
+            </div>
+          </div>
+
+          <div class="twg-table-wrap">
+            <table class="twg-table">
+              <thead>
+                <tr>
+                  <th style="width:40px"><input type="checkbox" aria-label="Selecionar todos" /></th>
+                  <th aria-sort="none">Nome</th>
+                  <th>Status</th>
+                  <th>Período</th>
+                  <th style="width:22%">Progresso</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><input type="checkbox" /></td>
+                  <td>Avaliação de desempenho 2026</td>
+                  <td><span class="twg-badge twg-badge--active">Ativo</span></td>
+                  <td>01/03/2026 – 30/11/2026</td>
+                  <td><div class="twg-progress"><div class="twg-progress__track"><div class="twg-progress__bar" style="width:64%"></div></div><span class="twg-progress__value">64%</span></div></td>
+                  <td class="twg-cell--actions"><div class="twg-menu"><button class="twg-icon-btn" data-menu-toggle aria-label="Ações" data-test-id="cycles-1-actions-kebab"><span class="twg-icon">more_vert</span></button>
+                    <div class="twg-menu__list" hidden>
+                      <button class="twg-menu__item"><span class="twg-icon">edit</span>Editar</button>
+                      <button class="twg-menu__item"><span class="twg-icon">content_copy</span>Duplicar</button>
+                      <button class="twg-menu__item twg-menu__item--danger" data-open="modal"><span class="twg-icon">delete</span>Excluir</button>
+                    </div></div></td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" /></td>
+                  <td>Ciclo de feedback Q4</td>
+                  <td><span class="twg-badge twg-badge--scheduled">Agendado</span></td>
+                  <td>01/10/2026 – 15/12/2026</td>
+                  <td><div class="twg-progress"><div class="twg-progress__track"><div class="twg-progress__bar" style="width:0%"></div></div><span class="twg-progress__value">0%</span></div></td>
+                  <td class="twg-cell--actions"><button class="twg-icon-btn" aria-label="Ações"><span class="twg-icon">more_vert</span></button></td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" /></td>
+                  <td>Avaliação 180º lideranças</td>
+                  <td><span class="twg-badge twg-badge--draft">Rascunho</span></td>
+                  <td class="twg-cell--muted">—</td>
+                  <td><div class="twg-progress"><div class="twg-progress__track"><div class="twg-progress__bar" style="width:0%"></div></div><span class="twg-progress__value">0%</span></div></td>
+                  <td class="twg-cell--actions"><button class="twg-icon-btn" aria-label="Ações"><span class="twg-icon">more_vert</span></button></td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" /></td>
+                  <td>Avaliação de desempenho 2025</td>
+                  <td><span class="twg-badge twg-badge--completed">Encerrado</span></td>
+                  <td>01/03/2025 – 30/11/2025</td>
+                  <td><div class="twg-progress"><div class="twg-progress__track"><div class="twg-progress__bar" style="width:100%"></div></div><span class="twg-progress__value">100%</span></div></td>
+                  <td class="twg-cell--actions"><button class="twg-icon-btn" aria-label="Ações"><span class="twg-icon">more_vert</span></button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="twg-pagination">
+            <button class="twg-page-btn" disabled aria-label="Primeira página"><span class="twg-icon">keyboard_double_arrow_left</span></button>
+            <button class="twg-page-btn" disabled aria-label="Página anterior"><span class="twg-icon">chevron_left</span></button>
+            <button class="twg-page-btn" aria-current="page">1</button>
+            <button class="twg-page-btn">2</button>
+            <button class="twg-page-btn">3</button>
+            <button class="twg-page-btn" aria-label="Próxima página"><span class="twg-icon">chevron_right</span></button>
+            <select class="twg-select"><option>25 por página</option><option>50 por página</option><option>100 por página</option></select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="twg-bottom-nav" aria-label="Menu rápido">
+    <a class="twg-bottom-nav__item" href="#" aria-current="page"><span class="twg-bottom-nav__icon"><span class="twg-icon">event_repeat</span></span>Ciclos</a>
+    <a class="twg-bottom-nav__item" href="#"><span class="twg-bottom-nav__icon"><span class="twg-icon">flag</span></span>PDI</a>
+    <a class="twg-bottom-nav__item" href="#"><span class="twg-bottom-nav__icon"><span class="twg-icon">psychology</span></span>Competências</a>
+    <button class="twg-bottom-nav__item"><span class="twg-bottom-nav__icon"><span class="twg-icon">more_horiz</span></span>Mais</button>
+  </nav>
+</div>
+
+
+<div id="drawer" hidden>
+  <div class="twg-overlay"></div>
+  <aside class="twg-drawer" role="dialog" aria-labelledby="drawer-title">
+    <div class="twg-drawer__header">
+      <h2 id="drawer-title" style="margin:0;font-size:inherit;font-weight:inherit">Criar ciclo</h2>
+      <button class="twg-close" data-close aria-label="Fechar"><span class="twg-icon">close</span></button>
+    </div>
+    <form class="twg-drawer__body" id="cycle-form">
+      <div class="twg-form-grid">
+        <div class="twg-field twg-col-12">
+          <label class="twg-label" for="cycle-name">Nome<span class="twg-label__required">*</span></label>
+          <input id="cycle-name" class="twg-input" placeholder="Digite o nome do ciclo" data-test-id="cycles-form-name-input" />
+        </div>
+        <div class="twg-field twg-col-6">
+          <label class="twg-label" for="cycle-start">Início<span class="twg-label__required">*</span></label>
+          <input id="cycle-start" type="date" class="twg-input" />
+        </div>
+        <div class="twg-field twg-col-6">
+          <label class="twg-label" for="cycle-end">Término<span class="twg-label__required">*</span></label>
+          <input id="cycle-end" type="date" class="twg-input" />
+        </div>
+        <div class="twg-field twg-col-12">
+          <label class="twg-label" for="cycle-type">Tipo</label>
+          <select id="cycle-type" class="twg-select"><option>Avaliação de desempenho</option><option>Feedback</option></select>
+          <span class="twg-helper">Define quais etapas o ciclo terá.</span>
+        </div>
+        <div class="twg-field twg-col-12">
+          <label class="twg-label" for="cycle-description">Descrição</label>
+          <textarea id="cycle-description" class="twg-textarea" placeholder="Descreva o objetivo do ciclo"></textarea>
+        </div>
+      </div>
+      <div class="twg-drawer__actions">
+        <button type="submit" class="twg-btn twg-btn--primary" data-test-id="cycles-form-save-button">Salvar</button>
+        <button type="button" class="twg-btn twg-btn--outline" data-close>Cancelar</button>
+      </div>
+    </form>
+  </aside>
+</div>
+
+<div id="modal" hidden>
+  <div class="twg-overlay"></div>
+  <div class="twg-modal" role="alertdialog" aria-labelledby="modal-title">
+    <div class="twg-modal__header"><span id="modal-title">Excluir ciclo</span><button class="twg-close" data-close aria-label="Fechar"><span class="twg-icon">close</span></button></div>
+    <div class="twg-modal__body">Tem certeza que deseja excluir “Avaliação de desempenho 2026”? Essa ação não pode ser desfeita.</div>
+    <div class="twg-modal__footer">
+      <button class="twg-btn twg-btn--outline" data-close>Cancelar</button>
+      <button class="twg-btn twg-btn--primary" data-close data-test-id="cycles-confirm-delete-button">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<div class="twg-toast-region" id="toasts"></div>
+
+<script>
+  document.getElementById('panel-toggle').addEventListener('click', () => {
+    document.getElementById('panel').classList.toggle('twg-panel--collapsed');
+  });
+  document.querySelectorAll('[data-group-toggle]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const children = btn.nextElementSibling;
+      const open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!open));
+      children.hidden = open;
+      btn.querySelector('.twg-nav-item__chevron').textContent = open ? 'chevron_right' : 'expand_more';
+    });
+  });
+  document.querySelectorAll('[data-menu-toggle]').forEach((btn) => {
+    btn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const list = btn.nextElementSibling;
+      list.hidden = !list.hidden;
+    });
+  });
+  document.addEventListener('click', () => document.querySelectorAll('.twg-menu__list').forEach((list) => (list.hidden = true)));
+  document.querySelectorAll('.twg-tab').forEach((tab) => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.twg-tab').forEach((t) => t.setAttribute('aria-selected', 'false'));
+      tab.setAttribute('aria-selected', 'true');
+    });
+  });
+
+  const openLayer = (id) => { document.getElementById(id).hidden = false; };
+  const closeLayers = () => document.querySelectorAll('#drawer, #modal').forEach((layer) => (layer.hidden = true));
+  document.querySelectorAll('[data-open]').forEach((btn) => btn.addEventListener('click', () => openLayer(btn.dataset.open)));
+  document.querySelectorAll('[data-close]').forEach((btn) => btn.addEventListener('click', closeLayers));
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeLayers(); });
+  const showToast = (title, message) => {
+    const toast = document.createElement('div');
+    toast.className = 'twg-toast twg-toast--success';
+    toast.setAttribute('role', 'status');
+    toast.innerHTML = '<span class="twg-icon" style="color:#38a169">check_circle</span><div><div class="twg-toast__title"></div><span class="twg-toast__message"></span></div><button class="twg-close twg-toast__close" aria-label="Fechar"><span class="twg-icon" style="font-size:18px">close</span></button>';
+    toast.querySelector('.twg-toast__title').textContent = title;
+    toast.querySelector('.twg-toast__message').textContent = message;
+    toast.querySelector('button').addEventListener('click', () => toast.remove());
+    document.getElementById('toasts').appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
+  };
+  document.getElementById('cycle-form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    closeLayers();
+    showToast('Ciclo criado', 'Os participantes serão notificados no início do ciclo.');
+  });
+  const params = new URLSearchParams(location.search);
+  if (params.get('drawer') === 'new') openLayer('drawer');
+  if (params.get('modal') === 'delete') openLayer('modal');
+  if (params.get('toast') === 'success') showToast('Ciclo criado', 'Os participantes serão notificados no início do ciclo.');
+</script>
+</body>
+</html>

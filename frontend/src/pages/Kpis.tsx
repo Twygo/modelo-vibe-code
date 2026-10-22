@@ -48,14 +48,18 @@ export default function Kpis() {
         </div>
       </div>
 
-      <form onSubmit={criar} style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+      <form onSubmit={criar} className="twg-toolbar">
         <input
+          className="twg-input"
+          style={{ maxWidth: 320 }}
           placeholder="Nome do indicador"
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           required
         />
         <input
+          className="twg-input"
+          style={{ maxWidth: 160 }}
           placeholder="Valor"
           type="number"
           step="any"
@@ -63,7 +67,9 @@ export default function Kpis() {
           onChange={(e) => setValor(e.target.value)}
           required
         />
-        <button type="submit" className="btn">Adicionar</button>
+        <button type="submit" className="twg-btn twg-btn--primary">
+          <span className="twg-icon">add</span>Adicionar
+        </button>
       </form>
 
       {erro && <p className="error">{erro}</p>}
